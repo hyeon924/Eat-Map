@@ -13,10 +13,25 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: "Maplestory";
+  src: url("/fonts/Maplestory Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Maplestory";
+  src: url("/fonts/Maplestory Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 html,
 body {
   width: 100%;
   height: 100%;
   overflow: auto;
   overflow-x: hidden;
+  font-family: "Maplestory", sans-serif;
 }

@@ -159,15 +159,23 @@ function App() {
   return (
     <div className="min-h-screen w-screen flex flex-col items-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-auto py-12 px-4">
       <div className="w-full max-w-4xl mx-auto">
-        <h1 className="text-4xl sm:text-5xl font-black text-center mb-12 bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent animate-gradient">
-          맛콩이 맛집
-        </h1>
+        <div className="relative mb-16">
+          <h1 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 bg-clip-text text-transparent animate-gradient-x">
+            <span className="inline-block animate-bounce cursor-pointer">
+              🍙
+            </span>{" "}
+            맛콩이 맛집{" "}
+            <span className="inline-block animate-bounce cursor-pointer">
+              🍽
+            </span>
+          </h1>
+        </div>
 
         {/* 검색 영역 */}
-        <div className="backdrop-blur-lg bg-white/70 rounded-2xl shadow-xl border border-orange-100 p-8 mb-12 transform hover:scale-[1.02] transition-all duration-300">
+        <div className="backdrop-blur-lg bg-white/70 rounded-2xl shadow-xl border border-orange-100 p-8 mb-12">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
             <select
-              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium cursor-pointer"
               value={region}
               onChange={(e) => setRegion(e.target.value)}
             >
@@ -177,7 +185,7 @@ function App() {
               <option>대구</option>
             </select>
             <select
-              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium cursor-pointer"
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
             >
@@ -190,7 +198,7 @@ function App() {
             </select>
 
             <select
-              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium cursor-pointer"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -203,7 +211,7 @@ function App() {
             <button
               onClick={handleSearch}
               disabled={isLoading}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-lg hover:shadow-xl hover:from-orange-600 hover:to-amber-600 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-lg hover:shadow-xl hover:from-orange-600 hover:to-amber-600 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? "검색 중..." : "검색하기"}
             </button>
@@ -216,15 +224,15 @@ function App() {
             <div className="text-gray-600 font-medium">
               총 {results.length}개
             </div>
-            <select
+            {/* <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 rounded-lg border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium"
+              className="px-4 py-2 rounded-lg border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium cursor-pointer"
             >
               <option value="인기순">인기순</option>
               <option value="거리순">거리순</option>
               <option value="이름순">이름순</option>
-            </select>
+            </select> */}
           </div>
         )}
 
@@ -296,7 +304,7 @@ function App() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded-lg border transition 
+                    className={`px-4 py-2 rounded-lg border transition cursor-pointer
                     ${
                       page === currentPage
                         ? "bg-orange-500 text-white font-bold"
@@ -314,78 +322,85 @@ function App() {
 
       {/* 상세 정보 모달 */}
       {selectedRestaurant && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full h-[85%] max-h-[95vh] overflow-y-auto">
+            <div className="p-10">
+              <div className="flex justify-between items-start mb-10">
+                <h2 className="text-3xl font-bold text-gray-800">
                   {selectedRestaurant.title}
                 </h2>
                 <button
                   onClick={handleCloseModal}
-                  className="text-gray-500 hover:text-orange-500 transition-colors"
+                  className="text-gray-500 hover:text-orange-500 transition-colors cursor-pointer text-2xl"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-2">
-                  <span className="text-orange-600 font-semibold w-24">
+              <div className="space-y-8">
+                <div className="flex items-start gap-4">
+                  <span className="text-orange-600 font-semibold w-28 text-lg">
                     주소
                   </span>
-                  <span className="text-gray-600">
-                    {selectedRestaurant.addr1}
+                  <span className="text-gray-600 text-lg">
+                    {selectedRestaurant.addr1 || "등록된 주소가 없습니다"}
                   </span>
                 </div>
 
-                {selectedRestaurant.tel && (
-                  <div className="flex items-start gap-2">
-                    <span className="text-orange-600 font-semibold w-24">
-                      전화번호
-                    </span>
-                    <span className="text-gray-600">
-                      {selectedRestaurant.tel}
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-start gap-4">
+                  <span className="text-orange-600 font-semibold w-28 text-lg">
+                    전화번호
+                  </span>
+                  <span className="text-gray-600 text-lg">
+                    {selectedRestaurant.tel || "등록된 전화번호가 없습니다"}
+                  </span>
+                </div>
 
-                {selectedRestaurant.homepage && (
-                  <div className="flex items-start gap-2">
-                    <span className="text-orange-600 font-semibold w-24">
-                      홈페이지
-                    </span>
+                <div className="flex items-start gap-4">
+                  <span className="text-orange-600 font-semibold w-28 text-lg">
+                    홈페이지
+                  </span>
+                  {selectedRestaurant.homepage ? (
                     <a
                       href={selectedRestaurant.homepage}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-orange-600 hover:text-orange-700 hover:underline"
+                      className="text-orange-600 hover:text-orange-700 hover:underline cursor-pointer text-lg"
                     >
                       {selectedRestaurant.homepage}
                     </a>
-                  </div>
-                )}
-
-                {selectedRestaurant.overview && (
-                  <div className="flex items-start gap-2">
-                    <span className="text-orange-600 font-semibold w-24">
-                      소개
+                  ) : (
+                    <span className="text-gray-600 text-lg">
+                      등록된 홈페이지가 없습니다
                     </span>
-                    <p className="text-gray-600">
-                      {selectedRestaurant.overview}
-                    </p>
-                  </div>
-                )}
+                  )}
+                </div>
 
-                {selectedRestaurant.firstimage && (
-                  <div className="mt-6">
+                <div className="flex items-start gap-4">
+                  <span className="text-orange-600 font-semibold w-28 text-lg">
+                    소개
+                  </span>
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    {selectedRestaurant.overview ||
+                      "등록된 소개 정보가 없습니다"}
+                  </p>
+                </div>
+
+                <div className="mt-10">
+                  {selectedRestaurant.firstimage ? (
                     <img
                       src={selectedRestaurant.firstimage}
                       alt={selectedRestaurant.title}
-                      className="w-full h-48 object-cover rounded-xl"
+                      className="w-full h-80 object-cover rounded-xl cursor-pointer hover:scale-[1.02] transition-transform duration-300"
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div className="w-full h-80 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <span className="text-gray-400 text-lg">
+                        등록된 이미지가 없습니다
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
