@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import "./App.css";
 
 const AREA_CODE = {
@@ -6,6 +6,71 @@ const AREA_CODE = {
   부산: 6,
   대전: 3,
   대구: 4,
+};
+
+const AREA_DATA = {
+  서울: {
+    종로구: 11110,
+    중구: 11140,
+    용산구: 11170,
+    성동구: 11200,
+    광진구: 11215,
+    동대문구: 11230,
+    중랑구: 11260,
+    성북구: 11290,
+    강북구: 11305,
+    도봉구: 11320,
+    노원구: 11350,
+    은평구: 11380,
+    서대문구: 11410,
+    마포구: 11440,
+    양천구: 11470,
+    강서구: 11500,
+    구로구: 11530,
+    금천구: 11545,
+    영등포구: 11560,
+    동작구: 11590,
+    관악구: 11620,
+    서초구: 11650,
+    강남구: 11680,
+    송파구: 11710,
+    강동구: 11740,
+  },
+  부산: {
+    중구: 26110,
+    서구: 26140,
+    동구: 26170,
+    영도구: 26200,
+    부산진구: 26230,
+    동래구: 26260,
+    남구: 26290,
+    북구: 26320,
+    해운대구: 26350,
+    사하구: 26380,
+    금정구: 26410,
+    강서구: 26440,
+    연제구: 26470,
+    수영구: 26500,
+    사상구: 26530,
+    기장군: 26710,
+  },
+  대전: {
+    동구: 30110,
+    중구: 30140,
+    서구: 30170,
+    유성구: 30200,
+    대덕구: 30230,
+  },
+  대구: {
+    중구: 27110,
+    동구: 27140,
+    서구: 27170,
+    남구: 27200,
+    북구: 27230,
+    수성구: 27260,
+    달서구: 27290,
+    달성군: 27710,
+  },
 };
 
 const CATEGORY_CODE = {
@@ -33,20 +98,26 @@ function App() {
   const [sortBy, setSortBy] = useState("인기순");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [district, setDistrict] = useState("");
 
-  const fetchRestaurants = useCallback(async (region, category) => {
+  const fetchRestaurants = useCallback(async (region, category, district) => {
     const areaCode = AREA_CODE[region];
     const categoryCode = CATEGORY_CODE[category];
 
-    const url = `https://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=${API_KEY}&MobileOS=ETC&MobileApp=EatMap&_type=json&contentTypeId=39&areaCode=${areaCode}&cat3=${categoryCode}&numOfRows=80`;
+    const url = `https://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=${API_KEY}&MobileOS=ETC&MobileApp=EatMap&_type=json&contentTypeId=39&areaCode=${areaCode}&numOfRows=80`;
 
     try {
       setIsLoading(true);
       const response = await fetch(url);
       const json = await response.json();
       const items = json.response.body.items?.item || [];
-      console.log("받아온 음식점 목록:", items);
-      setResults(items);
+
+      // 👇 구 필터링 (district가 있을 때만)
+      const filteredItems = district
+        ? items.filter((item) => item.addr1?.includes(district))
+        : items;
+
+      setResults(filteredItems);
     } catch (err) {
       console.error("API 호출 오류", err);
     } finally {
@@ -56,8 +127,8 @@ function App() {
 
   const handleSearch = useCallback(() => {
     setCurrentPage(1);
-    fetchRestaurants(region, category);
-  }, [region, category, fetchRestaurants]);
+    fetchRestaurants(region, category, district);
+  }, [region, category, district, fetchRestaurants]);
 
   const handleRestaurantClick = useCallback((restaurant) => {
     setSelectedRestaurant(restaurant);
@@ -76,6 +147,14 @@ function App() {
   const totalPages = useMemo(() => {
     return Math.ceil(results.length / itemsPerPage);
   }, [results]);
+
+  const districtOptions = useMemo(() => {
+    return Object.keys(AREA_DATA[region] || {});
+  }, [region]);
+
+  useEffect(() => {
+    setDistrict("");
+  }, [region]);
 
   return (
     <div className="min-h-screen w-screen flex flex-col items-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-auto py-12 px-4">
@@ -96,6 +175,18 @@ function App() {
               <option>부산</option>
               <option>대전</option>
               <option>대구</option>
+            </select>
+            <select
+              className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-orange-100 bg-white/80 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 transition-all duration-200 text-gray-700 font-medium"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+            >
+              <option value="">전체(구)</option>
+              {districtOptions.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
             </select>
 
             <select
@@ -162,8 +253,8 @@ function App() {
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
                           d="M21.1 17.032C20.9963 17.1127 20.8777 17.1722 20.751 17.207C20.6242 17.2418 20.4919 17.2513 20.3615 17.235C20.2311 17.2187 20.1052 17.1768 19.991 17.1117C19.8768 17.0467 19.7766 16.9598 19.696 16.856L17.202 13.65C16.8761 13.2304 16.4264 12.924 15.9167 12.7743C15.4069 12.6247 14.863 12.6392 14.362 12.816L14.869 13.455L19.071 17.657C19.2532 17.8456 19.3539 18.0982 19.3517 18.3604C19.3494 18.6226 19.2442 18.8734 19.0588 19.0588C18.8734 19.2442 18.6226 19.3494 18.3604 19.3517C18.0982 19.354 17.8456 19.2532 17.657 19.071L13.455 14.869L12.815 14.362C12.6383 14.8631 12.6239 15.4071 12.7738 15.9169C12.9237 16.4266 13.2302 16.8763 13.65 17.202L16.857 19.696C17.0597 19.861 17.1898 20.0989 17.2193 20.3586C17.2488 20.6184 17.1754 20.8793 17.0148 21.0857C16.8543 21.292 16.6194 21.4272 16.3603 21.4624C16.1013 21.4976 15.8388 21.43 15.629 21.274L12.422 18.78C11.5805 18.1253 10.9966 17.1951 10.773 16.1526C10.5493 15.1102 10.7001 14.0223 11.199 13.08L4.422 7.705C4.16361 7.50033 3.95144 7.24332 3.79943 6.95084C3.64741 6.65836 3.55899 6.33703 3.53997 6.00795C3.52094 5.67887 3.57175 5.3495 3.68905 5.04145C3.80635 4.7334 3.98748 4.45365 4.22056 4.22057C4.45364 3.98748 4.73339 3.80635 5.04144 3.68905C5.34949 3.57175 5.67887 3.52095 6.00795 3.53997C6.33703 3.55899 6.65835 3.64742 6.95083 3.79943C7.24332 3.95145 7.50033 4.16361 7.705 4.422L13.08 11.199C14.0223 10.7001 15.1102 10.5493 16.1526 10.773C17.1951 10.9966 18.1253 11.5805 18.78 12.422L21.275 15.629C21.4377 15.8384 21.5105 16.1038 21.4775 16.3669C21.4445 16.63 21.3094 16.8693 21.1 17.032ZM7.951 7.952L6.138 5.665C6.10863 5.62736 6.0716 5.59639 6.02936 5.57414C5.98712 5.55189 5.94064 5.53887 5.89299 5.53594C5.84534 5.53301 5.79761 5.54024 5.75296 5.55715C5.70831 5.57405 5.66777 5.60025 5.63401 5.63401C5.60025 5.66777 5.57405 5.70831 5.55715 5.75296C5.54024 5.79761 5.53301 5.84534 5.53594 5.89299C5.53887 5.94064 5.55189 5.98712 5.57414 6.02936C5.59639 6.0716 5.62736 6.10863 5.665 6.138L7.951 7.952Z"
                           fill="#ffffff"
                         />
