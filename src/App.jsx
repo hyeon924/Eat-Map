@@ -168,14 +168,25 @@ function App() {
     <div className="min-h-screen w-screen flex flex-col items-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-auto py-12 px-4">
       <div className="w-full max-w-4xl mx-auto">
         <div className="relative mb-16">
-          <h1 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 bg-clip-text text-transparent animate-gradient-x">
-            <span className="inline-block animate-bounce cursor-pointer">
-              🍙
-            </span>{" "}
-            맛콩이 맛집{" "}
-            <span className="inline-block animate-bounce cursor-pointer">
-              🍽
-            </span>
+          <h1 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 bg-clip-text text-transparent animate-gradient-x py-4 px-8">
+            <div className="flex items-center justify-center gap-4">
+              <img
+                src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Fork%20and%20Knife%20with%20Plate.png"
+                alt="Fork and Knife with Plate"
+                width="60"
+                height="60"
+                className="animate-bounce"
+              />
+              <span>맛콩이 맛집</span>
+              <img
+                src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Fork%20and%20Knife%20with%20Plate.png"
+                alt="Fork and Knife with Plate"
+                width="60"
+                height="60"
+                className="animate-bounce"
+                style={{ animationDelay: "0.2s" }}
+              />
+            </div>
           </h1>
         </div>
 
