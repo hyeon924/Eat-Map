@@ -155,6 +155,14 @@ function App() {
   useEffect(() => {
     setDistrict("");
   }, [region]);
+  const images = useMemo(() => {
+    const list = [];
+    if (selectedRestaurant?.firstimage)
+      list.push(selectedRestaurant.firstimage);
+    if (selectedRestaurant?.firstimage2)
+      list.push(selectedRestaurant.firstimage2);
+    return list;
+  }, [selectedRestaurant]);
 
   return (
     <div className="min-h-screen w-screen flex flex-col items-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-auto py-12 px-4">
@@ -221,7 +229,7 @@ function App() {
         {/* 검색 결과 정보 및 정렬 옵션 */}
         {results.length > 0 && (
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-            <div className="text-gray-600 font-medium">
+            <div className="text-gray-600 font-bold text-md">
               총 {results.length}개
             </div>
             {/* <select
@@ -323,7 +331,7 @@ function App() {
       {/* 상세 정보 모달 */}
       {selectedRestaurant && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-4xl w-full h-[85%] max-h-[95vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-4xl w-full h-[100%] max-h-[95vh] overflow-y-auto">
             <div className="p-10">
               <div className="flex justify-between items-start mb-10">
                 <h2 className="text-3xl font-bold text-gray-800">
@@ -337,17 +345,34 @@ function App() {
                 </button>
               </div>
 
-              <div className="space-y-8">
-                <div className="flex items-start gap-4">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
                   <span className="text-orange-600 font-semibold w-28 text-lg">
                     주소
                   </span>
-                  <span className="text-gray-600 text-lg">
-                    {selectedRestaurant.addr1 || "등록된 주소가 없습니다"}
-                  </span>
+                  <div className="flex flex-row items-center justify-between flex-1">
+                    <span className="text-gray-600 text-lg">
+                      {selectedRestaurant.addr1 || "등록된 주소가 없습니다"}
+                    </span>
+                    {selectedRestaurant.addr1 && (
+                      <button
+                        onClick={() =>
+                          window.open(
+                            `https://map.kakao.com/?q=${encodeURIComponent(
+                              selectedRestaurant.addr1
+                            )}`,
+                            "_blank"
+                          )
+                        }
+                        className="text-sm text-orange-500 underline hover:text-orange-600 transition-colors ml-4"
+                      >
+                        카카오지도에서 보기
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-start gap-4">
+                <div className="flex items-center gap-4">
                   <span className="text-orange-600 font-semibold w-28 text-lg">
                     전화번호
                   </span>
@@ -356,7 +381,7 @@ function App() {
                   </span>
                 </div>
 
-                <div className="flex items-start gap-4">
+                <div className="flex items-center gap-4">
                   <span className="text-orange-600 font-semibold w-28 text-lg">
                     홈페이지
                   </span>
@@ -380,19 +405,21 @@ function App() {
                   <span className="text-orange-600 font-semibold w-28 text-lg">
                     소개
                   </span>
-                  <p className="text-gray-600 text-lg leading-relaxed">
+                  <p className="text-gray-600 text-lg leading-relaxed flex-1">
                     {selectedRestaurant.overview ||
                       "등록된 소개 정보가 없습니다"}
                   </p>
                 </div>
 
-                <div className="mt-10">
+                <div className="mt-8">
                   {selectedRestaurant.firstimage ? (
-                    <img
-                      src={selectedRestaurant.firstimage}
-                      alt={selectedRestaurant.title}
-                      className="w-full h-80 object-cover rounded-xl cursor-pointer hover:scale-[1.02] transition-transform duration-300"
-                    />
+                    <div className="w-full max-h-[500px] overflow-hidden rounded-xl">
+                      <img
+                        src={selectedRestaurant.firstimage}
+                        alt={selectedRestaurant.title}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-80 bg-gray-100 rounded-xl flex items-center justify-center">
                       <span className="text-gray-400 text-lg">
