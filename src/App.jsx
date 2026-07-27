@@ -27,9 +27,9 @@ const FACILITY_FILTERS = [
 ];
 
 const availability = (value, yes = "가능", no = "불가") =>
-  value === "Y" ? `✅ ${yes}` : value === "N" ? `🚫 ${no}` : "🙈 미제공";
+  value === "Y" ? `✅ ${yes}` : value === "N" ? `🚫 ${no}` : "-";
 
-const displayValue = (value) => value || "🙈 미제공";
+const displayValue = (value) => value || "-";
 
 function App() {
   const [areaFilter, setAreaFilter] = useState("");
@@ -265,17 +265,17 @@ function App() {
             <button className="modal-close" onClick={() => setSelectedRestaurant(null)} aria-label="닫기">×</button>
             <p className="eyebrow">RESTAURANT OPERATIONS</p>
             <h2>{selectedRestaurant.title}</h2>
-            <p className="modal-menu">{displayValue(selectedRestaurant.representativeMenu)}</p>
+            <p className={`modal-menu ${selectedRestaurant.representativeMenu ? "" : "empty-value"}`}>{displayValue(selectedRestaurant.representativeMenu)}</p>
             <section className="landmark-card">
               <span className="landmark-icon">📍</span>
-              <div><span>인근 랜드마크</span><strong>{displayValue(selectedRestaurant.landmark)}</strong></div>
+              <div><span>인근 랜드마크</span><strong className={selectedRestaurant.landmark ? "" : "empty-value"}>{displayValue(selectedRestaurant.landmark)}</strong></div>
             </section>
             <div className="details-grid">
               {detailItems.map(([label, value]) => (
-                <div key={label}><span>{label}</span><strong>{value}</strong></div>
+              <div key={label}><span>{label}</span><strong className={value === "-" ? "empty-value" : ""}>{value}</strong></div>
               ))}
             </div>
-            <p className="tags">{selectedRestaurant.hashtags || "🙈 해시태그 정보 없음"}</p>
+            <p className={`tags ${selectedRestaurant.hashtags ? "" : "empty-value"}`}>{selectedRestaurant.hashtags || "-"}</p>
             <div className="homepage-section">
               <span>홈페이지</span>
               {selectedRestaurant.homepageLinks.length > 0 ? (
@@ -284,7 +284,7 @@ function App() {
                   <a className="homepage-link" href={url} key={url} target="_blank" rel="noreferrer">홈페이지 방문 ↗</a>
                 ))}
                 </div>
-              ) : <strong>🙈 미제공</strong>}
+              ) : <strong className="empty-value">-</strong>}
             </div>
           </section>
         </div>
