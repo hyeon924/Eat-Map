@@ -104,6 +104,8 @@ function App() {
   }, [currentPage, results, sortBy]);
 
   const totalPages = Math.ceil(results.length / itemsPerPage);
+  const pageGroupStart = Math.floor((currentPage - 1) / 10) * 10 + 1;
+  const pageGroupEnd = Math.min(pageGroupStart + 9, totalPages);
   const activeFilterCount = Number(Boolean(areaFilter)) + Object.values(facilityFilters).filter(Boolean).length;
   const detailItems = selectedRestaurant
     ? [
@@ -251,9 +253,23 @@ function App() {
 
           {totalPages > 1 && (
             <nav className="pagination" aria-label="검색 결과 페이지">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+              <button
+                aria-label="이전 페이지 목록"
+                disabled={pageGroupStart === 1}
+                onClick={() => setCurrentPage(Math.max(1, pageGroupStart - 10))}
+              >
+                ‹
+              </button>
+              {Array.from({ length: pageGroupEnd - pageGroupStart + 1 }, (_, index) => pageGroupStart + index).map((page) => (
                 <button key={page} className={page === currentPage ? "active" : ""} onClick={() => setCurrentPage(page)}>{page}</button>
               ))}
+              <button
+                aria-label="다음 페이지 목록"
+                disabled={pageGroupEnd === totalPages}
+                onClick={() => setCurrentPage(Math.min(totalPages, pageGroupEnd + 1))}
+              >
+                ›
+              </button>
             </nav>
           )}
         </section>
