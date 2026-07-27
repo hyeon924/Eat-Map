@@ -140,19 +140,19 @@ function App() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="맛콩이 맛집 홈">
           <span className="brand-mark">M</span>
-          <span>맛콩이<span className="brand-accent">.</span></span>
+          <span>서울 미식<span className="brand-accent">.</span></span>
         </a>
-        <div className="topbar-label">SEOUL RESTAURANT OPERATIONS</div>
-        <button className="topbar-button" onClick={fetchRestaurants}>식당 둘러보기</button>
+        <div className="topbar-label">SEOUL TRAVEL DINING GUIDE</div>
+        <button className="topbar-button" onClick={fetchRestaurants}>여행 식당 찾기</button>
       </header>
 
       <main id="top" className="dashboard">
         <aside className="filter-rail">
           <div className="filter-heading">
             <p>SEARCH FILTER</p>
-            <h1>오늘의 식당<br />운영 정보</h1>
+            <h1>서울 여행 중<br />식당 안내</h1>
           </div>
-          <p className="filter-copy">서울관광재단이 제공하는 식당 운영 데이터를 기준으로 찾습니다.</p>
+          <p className="filter-copy">여행 동선에서 필요한 운영시간과 편의시설 정보를 확인하세요.</p>
 
           <div className="filter-group area-filter">
             <label id="area-label">지역</label>
@@ -204,15 +204,16 @@ function App() {
 
           <div className="source-note">
             <span>DATA SOURCE</span>
-            서울관광재단<br />식당운영정보 API
+            서울관광재단<br />여행자용 식당 운영정보
           </div>
         </aside>
 
         <section className="content-area">
           <div className="welcome-panel">
             <div>
-              <p className="eyebrow">SMART DINING GUIDE</p>
-              <h2>식당의 <em>지금</em>을<br />확인하세요.</h2>
+              <p className="eyebrow">SEOUL TRAVEL DINING GUIDE</p>
+              <h2>여행 동선에 맞는<br /><em>식당 정보</em>를 찾으세요.</h2>
+              <p className="welcome-copy">랜드마크 근처 식당의 운영시간과 이용 편의 정보를 한곳에서 안내합니다.</p>
             </div>
             <div className="welcome-orb">🍽️</div>
           </div>
@@ -220,7 +221,7 @@ function App() {
           <div className="result-toolbar">
             <div>
               <p className="eyebrow">DISCOVER</p>
-              <h3>{results.length ? `${results.length.toLocaleString()}개의 식당` : "식당을 검색해 보세요"}</h3>
+              <h3>{results.length ? `여행 중 들르기 좋은 ${results.length.toLocaleString()}곳` : "여행 식당을 찾아보세요"}</h3>
             </div>
             {results.length > 0 && (
               <select className="sort-select" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
@@ -239,6 +240,7 @@ function App() {
                 <button className="restaurant-card" key={place.id} onClick={() => setSelectedRestaurant(place)}>
                   <div className="card-topline"><span>{place.area}</span><span className="status-dot">{place.status === "NORMAL" ? "● 정상 운영" : place.status || "상태 미상"}</span></div>
                   <h4>{place.title}</h4>
+                  <p className={`landmark-line ${place.landmark ? "" : "empty-card-value"}`}>📍 {place.landmark || "인근 랜드마크 정보 없음"}</p>
                   {place.representativeMenu && <p className="menu-name">{place.representativeMenu}</p>}
                   {place.businessHours && <div className="hours"><span>OPENING HOURS</span>{place.businessHours}</div>}
                   <div className="facility-row">
@@ -282,7 +284,7 @@ function App() {
         <div className="modal-backdrop" onMouseDown={() => setSelectedRestaurant(null)}>
           <section className="restaurant-modal" role="dialog" aria-modal="true" aria-label={`${selectedRestaurant.title} 운영 정보`} onMouseDown={(event) => event.stopPropagation()}>
             <button className="modal-close" onClick={() => setSelectedRestaurant(null)} aria-label="닫기">×</button>
-            <p className="eyebrow">RESTAURANT OPERATIONS</p>
+            <p className="eyebrow">SEOUL TRAVEL RESTAURANT GUIDE</p>
             <h2>{selectedRestaurant.title}</h2>
             <p className={`modal-menu ${selectedRestaurant.representativeMenu ? "" : "empty-value"}`}>{displayValue(selectedRestaurant.representativeMenu)}</p>
             <section className="landmark-card">
