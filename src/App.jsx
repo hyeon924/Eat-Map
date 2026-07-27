@@ -29,6 +29,9 @@ const FACILITY_FILTERS = [
 const availability = (value, yes = "가능", no = "불가") =>
   value === "Y" ? `✅ ${yes}` : value === "N" ? `🚫 ${no}` : "-";
 
+const plainAvailability = (value, yes = "가능", no = "불가") =>
+  value === "Y" ? yes : value === "N" ? no : "-";
+
 const displayValue = (value) => value || "-";
 
 function App() {
@@ -239,9 +242,9 @@ function App() {
                   {place.representativeMenu && <p className="menu-name">{place.representativeMenu}</p>}
                   {place.businessHours && <div className="hours"><span>OPENING HOURS</span>{place.businessHours}</div>}
                   <div className="facility-row">
-                    <span className={place.parking === "Y" ? "on" : ""}>주차 {availability(place.parking)}</span>
-                    <span className={place.wifi === "Y" ? "on" : ""}>와이파이 {availability(place.wifi, "제공", "미제공")}</span>
-                    <span className={place.delivery === "Y" ? "on" : ""}>배달 {availability(place.delivery)}</span>
+                    <span className={place.parking === "Y" ? "on" : ""}>주차 {plainAvailability(place.parking)}</span>
+                    <span className={place.wifi === "Y" ? "on" : ""}>와이파이 {plainAvailability(place.wifi, "제공", "미제공")}</span>
+                    <span className={place.delivery === "Y" ? "on" : ""}>배달 {plainAvailability(place.delivery)}</span>
                   </div>
                   <span className="card-arrow">↗</span>
                 </button>
