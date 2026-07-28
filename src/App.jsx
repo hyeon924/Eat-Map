@@ -97,12 +97,7 @@ function App() {
           .slice(0, 6)
           .map(([landmark]) => landmark)
       );
-      const restaurants = allRestaurants.filter((item) =>
-          (!areaFilter || item.area === areaFilter) &&
-          (!travelSpotFilter || item.landmark === travelSpotFilter) &&
-          Object.entries(facilityFilters).every(([key, enabled]) => !enabled || item[key] === "Y")
-      );
-      setResults(restaurants);
+      setResults(allRestaurants);
       setCurrentPage(1);
     } catch (requestError) {
       console.error("API 호출 오류", requestError);
@@ -111,19 +106,32 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [areaFilter, facilityFilters, travelSpotFilter]);
+  }, []);
 
   useEffect(() => {
     fetchRestaurants();
   }, [fetchRestaurants]);
 
+  const filteredResults = useMemo(
+    () => results.filter((item) =>
+      (!areaFilter || item.area === areaFilter) &&
+      (!travelSpotFilter || item.landmark === travelSpotFilter) &&
+      Object.entries(facilityFilters).every(([key, enabled]) => !enabled || item[key] === "Y")
+    ),
+    [areaFilter, facilityFilters, results, travelSpotFilter]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [areaFilter, facilityFilters, travelSpotFilter]);
+
   const paginatedResults = useMemo(() => {
-    const sorted = [...results].sort(SORT_OPTIONS[sortBy]);
+    const sorted = [...filteredResults].sort(SORT_OPTIONS[sortBy]);
     const start = (currentPage - 1) * itemsPerPage;
     return sorted.slice(start, start + itemsPerPage);
-  }, [currentPage, results, sortBy]);
+  }, [currentPage, filteredResults, sortBy]);
 
-  const totalPages = Math.ceil(results.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
   const pageGroupStart = Math.floor((currentPage - 1) / 10) * 10 + 1;
   const pageGroupEnd = Math.min(pageGroupStart + 9, totalPages);
   const activeFilterCount = Number(Boolean(areaFilter)) + Number(Boolean(travelSpotFilter)) + Object.values(facilityFilters).filter(Boolean).length;
@@ -155,7 +163,6 @@ function App() {
 
   const selectTravelSpot = (spot) => {
     setTravelSpotFilter((current) => current === spot ? "" : spot);
-    setResults([]);
     setCurrentPage(1);
   };
 
@@ -262,9 +269,9 @@ function App() {
           <div className="result-toolbar">
             <div>
               <p className="eyebrow">DISCOVER</p>
-              <h3>{results.length ? `${travelSpotFilter ? `${travelSpotFilter} 주변 ` : "여행 중 들르기 좋은 "}${results.length.toLocaleString()}곳` : "지금 어디를 여행 중인가요?"}</h3>
+              <h3>{filteredResults.length ? `${travelSpotFilter ? `${travelSpotFilter} 주변 ` : "여행 중 들르기 좋은 "}${filteredResults.length.toLocaleString()}곳` : "조건에 맞는 식당이 없습니다"}</h3>
             </div>
-            {results.length > 0 && (
+            {filteredResults.length > 0 && (
               <select className="sort-select" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
                 <option value="이름순">이름순</option>
                 <option value="영업시간순">영업시간순</option>
