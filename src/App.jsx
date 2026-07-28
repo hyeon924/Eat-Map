@@ -269,7 +269,7 @@ function App() {
                   <p className={`travel-card-label ${place.landmark ? "" : "empty-card-value"}`}>여행 동선 · {place.landmark || "랜드마크 정보 없음"}</p>
                   <h4>{place.title}</h4>
                   {place.representativeMenu && <p className="menu-name">{place.representativeMenu}</p>}
-                  {place.businessHours && <div className="hours"><span>OPENING HOURS</span>{place.businessHours}</div>}
+                  {place.businessHours && <div className="hours"><span>OPENING HOURS</span><p>{place.businessHours}</p></div>}
                   <div className="facility-row">
                     <span className={place.parking === "Y" ? "on" : ""}>주차 {plainAvailability(place.parking)}</span>
                     <span className={place.wifi === "Y" ? "on" : ""}>와이파이 {plainAvailability(place.wifi, "제공", "미제공")}</span>
@@ -320,7 +320,14 @@ function App() {
             </section>
             <div className="details-grid">
               {detailItems.map(([label, value]) => (
-              <div key={label}><span>{label}</span><strong className={value === "-" ? "empty-value" : ""}>{value}</strong></div>
+                <div key={label}>
+                  <span>{label}</span>
+                  <strong className={value === "-" ? "empty-value" : ""}>
+                    {value.split("|").map((line, index) => (
+                      <span className="detail-line" key={`${label}-${index}`}>{line.trim()}</span>
+                    ))}
+                  </strong>
+                </div>
               ))}
             </div>
             <p className={`tags ${selectedRestaurant.hashtags ? "" : "empty-value"}`}>{selectedRestaurant.hashtags || "-"}</p>
