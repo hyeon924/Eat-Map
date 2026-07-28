@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 const API_KEY = import.meta.env.VITE_SEOUL_TOURISM_API_KEY;
@@ -26,8 +26,6 @@ const FACILITY_FILTERS = [
   ["smartOrder", "스마트오더"],
 ];
 
-const TRAVEL_SPOTS = ["명동", "북촌", "홍대", "강남", "여의도"];
-
 const availability = (value, yes = "가능", no = "불가") =>
   value === "Y" ? `✅ ${yes}` : value === "N" ? `🚫 ${no}` : "-";
 
@@ -39,6 +37,7 @@ const displayValue = (value) => value || "-";
 function App() {
   const [areaFilter, setAreaFilter] = useState("");
   const [travelSpotFilter, setTravelSpotFilter] = useState("");
+  const [landmarkOptions, setLandmarkOptions] = useState([]);
   const [isAreaMenuOpen, setIsAreaMenuOpen] = useState(false);
   const [facilityFilters, setFacilityFilters] = useState({});
   const [results, setResults] = useState([]);
@@ -64,7 +63,7 @@ function App() {
       if (!response.ok) throw new Error("식당 정보를 불러오지 못했습니다.");
 
       const json = await response.json();
-      const restaurants = (json.data || [])
+      const allRestaurants = (json.data || [])
         .map((item) => ({
           id: item["식당(ID)"],
           title: item["식당명"],
@@ -87,12 +86,22 @@ function App() {
           multilingualMenu: item["다국어메뉴판제공여부"],
           smartOrder: item["스마트오더유무"],
           restroom: item["화장실정보내용"],
-        }))
-        .filter((item) =>
+        }));
+      const landmarkCounts = allRestaurants.reduce((counts, item) => {
+        if (item.landmark) counts.set(item.landmark, (counts.get(item.landmark) || 0) + 1);
+        return counts;
+      }, new Map());
+      setLandmarkOptions(
+        [...landmarkCounts.entries()]
+          .sort(([, countA], [, countB]) => countB - countA)
+          .slice(0, 6)
+          .map(([landmark]) => landmark)
+      );
+      const restaurants = allRestaurants.filter((item) =>
           (!areaFilter || item.area === areaFilter) &&
-          (!travelSpotFilter || item.landmark?.includes(travelSpotFilter)) &&
+          (!travelSpotFilter || item.landmark === travelSpotFilter) &&
           Object.entries(facilityFilters).every(([key, enabled]) => !enabled || item[key] === "Y")
-        );
+      );
       setResults(restaurants);
       setCurrentPage(1);
     } catch (requestError) {
@@ -103,6 +112,10 @@ function App() {
       setIsLoading(false);
     }
   }, [areaFilter, facilityFilters, travelSpotFilter]);
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, [fetchRestaurants]);
 
   const paginatedResults = useMemo(() => {
     const sorted = [...results].sort(SORT_OPTIONS[sortBy]);
@@ -168,7 +181,7 @@ function App() {
           <div className="travel-spots">
             <span>여행 동선 빠른 선택</span>
             <div>
-              {TRAVEL_SPOTS.map((spot) => (
+              {landmarkOptions.map((spot) => (
                 <button
                   type="button"
                   key={spot}
@@ -178,6 +191,7 @@ function App() {
                   {spot}
                 </button>
               ))}
+              {landmarkOptions.length === 0 && <em>랜드마크 정보를 불러오는 중입니다.</em>}
             </div>
           </div>
 
