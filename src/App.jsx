@@ -335,9 +335,7 @@ function App() {
               <span>홈페이지</span>
               {selectedRestaurant.homepageLinks.length > 0 ? (
                 <div className="homepage-links">
-                {selectedRestaurant.homepageLinks.map((url) => (
-                  <a className="homepage-link" href={url} key={url} target="_blank" rel="noreferrer">홈페이지 방문 ↗</a>
-                ))}
+                  <a className="homepage-link" href={selectedRestaurant.homepageLinks[0]} target="_blank" rel="noreferrer">홈페이지 방문 ↗</a>
                 </div>
               ) : <strong className="empty-value">-</strong>}
             </div>
