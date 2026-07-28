@@ -26,6 +26,8 @@ const FACILITY_FILTERS = [
   ["smartOrder", "스마트오더"],
 ];
 
+const TRAVEL_SPOTS = ["명동", "북촌", "홍대", "강남", "여의도"];
+
 const availability = (value, yes = "가능", no = "불가") =>
   value === "Y" ? `✅ ${yes}` : value === "N" ? `🚫 ${no}` : "-";
 
@@ -36,6 +38,7 @@ const displayValue = (value) => value || "-";
 
 function App() {
   const [areaFilter, setAreaFilter] = useState("");
+  const [travelSpotFilter, setTravelSpotFilter] = useState("");
   const [isAreaMenuOpen, setIsAreaMenuOpen] = useState(false);
   const [facilityFilters, setFacilityFilters] = useState({});
   const [results, setResults] = useState([]);
@@ -87,6 +90,7 @@ function App() {
         }))
         .filter((item) =>
           (!areaFilter || item.area === areaFilter) &&
+          (!travelSpotFilter || item.landmark?.includes(travelSpotFilter)) &&
           Object.entries(facilityFilters).every(([key, enabled]) => !enabled || item[key] === "Y")
         );
       setResults(restaurants);
@@ -98,7 +102,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [areaFilter, facilityFilters]);
+  }, [areaFilter, facilityFilters, travelSpotFilter]);
 
   const paginatedResults = useMemo(() => {
     const sorted = [...results].sort(SORT_OPTIONS[sortBy]);
@@ -109,7 +113,7 @@ function App() {
   const totalPages = Math.ceil(results.length / itemsPerPage);
   const pageGroupStart = Math.floor((currentPage - 1) / 10) * 10 + 1;
   const pageGroupEnd = Math.min(pageGroupStart + 9, totalPages);
-  const activeFilterCount = Number(Boolean(areaFilter)) + Object.values(facilityFilters).filter(Boolean).length;
+  const activeFilterCount = Number(Boolean(areaFilter)) + Number(Boolean(travelSpotFilter)) + Object.values(facilityFilters).filter(Boolean).length;
   const detailItems = selectedRestaurant
     ? [
         ["영업시간", displayValue(selectedRestaurant.businessHours)],
@@ -127,12 +131,19 @@ function App() {
 
   const resetFilters = () => {
     setAreaFilter("");
+    setTravelSpotFilter("");
     setFacilityFilters({});
     setIsAreaMenuOpen(false);
   };
 
   const toggleFacility = (key) => {
     setFacilityFilters((current) => ({ ...current, [key]: !current[key] }));
+  };
+
+  const selectTravelSpot = (spot) => {
+    setTravelSpotFilter((current) => current === spot ? "" : spot);
+    setResults([]);
+    setCurrentPage(1);
   };
 
   return (
@@ -152,10 +163,26 @@ function App() {
             <p>SEARCH FILTER</p>
             <h1>서울 여행 중<br />식당 안내</h1>
           </div>
-          <p className="filter-copy">여행 동선에서 필요한 운영시간과 편의시설 정보를 확인하세요.</p>
+          <p className="filter-copy">지금 여행 중인 장소와 필요한 편의시설을 골라보세요.</p>
+
+          <div className="travel-spots">
+            <span>여행 동선 빠른 선택</span>
+            <div>
+              {TRAVEL_SPOTS.map((spot) => (
+                <button
+                  type="button"
+                  key={spot}
+                  className={travelSpotFilter === spot ? "active" : ""}
+                  onClick={() => selectTravelSpot(spot)}
+                >
+                  {spot}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="filter-group area-filter">
-            <label id="area-label">지역</label>
+            <label id="area-label">세부 지역</label>
             <div className="area-dropdown">
               <button
                 type="button"
@@ -221,7 +248,7 @@ function App() {
           <div className="result-toolbar">
             <div>
               <p className="eyebrow">DISCOVER</p>
-              <h3>{results.length ? `여행 중 들르기 좋은 ${results.length.toLocaleString()}곳` : "여행 식당을 찾아보세요"}</h3>
+              <h3>{results.length ? `${travelSpotFilter ? `${travelSpotFilter} 주변 ` : "여행 중 들르기 좋은 "}${results.length.toLocaleString()}곳` : "지금 어디를 여행 중인가요?"}</h3>
             </div>
             {results.length > 0 && (
               <select className="sort-select" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
@@ -239,8 +266,8 @@ function App() {
               {paginatedResults.map((place) => (
                 <button className="restaurant-card" key={place.id} onClick={() => setSelectedRestaurant(place)}>
                   <div className="card-topline"><span>{place.area}</span><span className="status-dot">{place.status === "NORMAL" ? "● 정상 운영" : place.status || "상태 미상"}</span></div>
+                  <p className={`travel-card-label ${place.landmark ? "" : "empty-card-value"}`}>여행 동선 · {place.landmark || "랜드마크 정보 없음"}</p>
                   <h4>{place.title}</h4>
-                  <p className={`landmark-line ${place.landmark ? "" : "empty-card-value"}`}>📍 {place.landmark || "인근 랜드마크 정보 없음"}</p>
                   {place.representativeMenu && <p className="menu-name">{place.representativeMenu}</p>}
                   {place.businessHours && <div className="hours"><span>OPENING HOURS</span>{place.businessHours}</div>}
                   <div className="facility-row">
